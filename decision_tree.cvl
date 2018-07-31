@@ -127,74 +127,13 @@ void split(Instance** instances, int numInstances, int feature, double split, In
   *numRightOut = numRight;
 }
 
-// calcEntropy helper function
-void info(Instance** instances, int numInstances, int numClasses, int feature, double split, int* numLeftOut, double* infoLeftOut, int* numRightOut, double* infoRightOut) {
-  assert(numClasses > 0);
-  int numLeft = 0;
-  int leftClassCount[numClasses];
-  double infoLeft = 0.0;
-  
-  int numRight = 0;
-  int rightClassCount[numClasses];
-  double infoRight = 0.0;
-
-  for (int i = 0; i < numClasses; i++) {
-    leftClassCount[i] = 0;
-    rightClassCount[i] = 0;
-  }
-
-  for (int i = 0; i < numInstances; i++) {
-    if (instances[i]->featureValues[feature] <= split) {
-      numLeft++;
-      leftClassCount[instances[i]->class]++;
-    } else {
-      numRight++;
-      rightClassCount[instances[i]->class]++;
-    }
-  }
-
-  for (int i = 0; i < numClasses; i++) {
-    if (numLeft != 0) {
-      double dLeft = ((double) leftClassCount[i]) / ((double) numLeft);
-      
-      if (dLeft != 0)
-	infoLeft += -dLeft * log2(dLeft);
-    }
-
-    if (numRight != 0){
-      double dRight = ((double) rightClassCount[i]) / ((double) numRight);
-      
-      if (dRight != 0)
-	infoRight += -dRight * log2(dRight);
-    }
-  }
-
-  *numLeftOut = numLeft;
-  *infoLeftOut = infoLeft;
-  *numRightOut = numRight;
-  *infoRightOut = infoRight;
-}
-
 // Returns the entropy of the array of instances split on the specified feature and split value
-double calcEntropy(Instance** instances, int numInstances, int feature, double split, int numClasses) {
-  assert(instances != NULL);
-  assert(numInstances > 0);
-  assert(numClasses > 0);
-  double entropy = 0;
-
-  int numLeft = 0;
-  double infoLeft = 0.0;
-  int numRight = 0;
-  double infoRight = 0.0;
-
-  info(instances, numInstances, numClasses, feature, split, &numLeft, &infoLeft, &numRight, &infoRight);
-
-  entropy += (((double) numLeft) / numInstances) * infoLeft;
-  entropy += (((double) numRight) / numInstances) * infoRight;
-
-  //assert(entropy >= 0); (CIVL will not work well enough with log2 to verify this)
-  return entropy;
-}
+/*double calcEntropy(Instance** instances, int numInstances, int feature, double split, int numClasses) {
+  double x;
+  $havoc(&x);
+  $assume(x >= 0);
+  return x;
+  }*/
 
 // Finds the feature and split value that minimize the entropy on the list of instances
 // Changes the input parameters featureOut and splitOut to the best feature and split value
@@ -202,25 +141,30 @@ void findBestFeatureAndSplit(Instance** instances, int numInstances, int numFeat
   assert(instances != NULL);
   assert(numFeatures > 0);
   assert(numClasses > 0);
-  double minEntropy = -1;
-  int bestFeature = 0;
-  double bestSplit = 0.0;
   
   for (int i = 0; i < numFeatures; i++) {
 
     for (int j = 0; j < numInstances; j++) {
 
-      double entropy = calcEntropy(instances, numInstances, i, instances[j]->featureValues[i], numClasses);
-      if (entropy < minEntropy || minEntropy == -1) {
-	minEntropy = entropy;
-	bestFeature = i;
-	bestSplit = instances[j]->featureValues[i];
+      int countLeft = 0;
+      int countRight = 0;
+      for (int k = 0; k < numInstances; k++) {
+
+	if (instances[k]->featureValues[i] <= instances[j]->featureValues[i]) {
+	  countLeft++;
+	} else {
+	  countRight++;
+	}
+
+	if (countLeft > 0 && countRight > 0) {
+	  *featureOut = i;
+	  *splitOut = instances[i]->featureValues[j];
+	  return;
+	}
       }
     }
   }
-
-  *featureOut = bestFeature;
-  *splitOut = bestSplit;  
+  //return;
 }
 
 // Recursive function that creates a decision tree on the instances specified
