@@ -28,6 +28,7 @@ typedef struct DecisionTree {
   DecisionTreeNode* root;
 } DecisionTree;
 
+void verifyEntropy(Names* names);
 DecisionTree* makeTree(Names* names);
 int classify(DecisionTree* tree, Instance* instance);
 double accuracy(DecisionTree* tree, Instance** instances, int numInstances);
