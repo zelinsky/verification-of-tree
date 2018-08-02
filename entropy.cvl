@@ -1,12 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
-#include <math.h>
+//#include <math.h>
 #include "decision_tree.h"
 #include "input.h"
 
 #define LEFT 0
 #define RIGHT 1
+
+// Abstract log2 function
+$abstract double log2(double x);
+$assume($forall(double x | x > 0 && x <= 1) $forall(double y | y > 0 && y <= 1 && y < x) log2(x) > log2(y) && log2(x) <= 0 && log2(y) <= 0);
 
 // Node
 // Prints out the feature and split value of the node or the class if it is a lead node
@@ -156,15 +160,17 @@ void info(Instance** instances, int numInstances, int numClasses, int feature, d
   for (int i = 0; i < numClasses; i++) {
     if (numLeft != 0) {
       double dLeft = ((double) leftClassCount[i]) / ((double) numLeft);
+      //assert(dLeft >= 0 && dLeft <= 1);
       
-      if (dLeft != 0)
+      if (dLeft > 0)
 	infoLeft += -dLeft * log2(dLeft);
     }
 
     if (numRight != 0){
       double dRight = ((double) rightClassCount[i]) / ((double) numRight);
+      //assert(dRight >= 0 && dRight <= 1);
       
-      if (dRight != 0)
+      if (dRight > 0)
 	infoRight += -dRight * log2(dRight);
     }
   }
@@ -278,10 +284,17 @@ void verifyEntropy(Names* names) {
   Instance** rightInstances = NULL;
   int numRight = 0;
   split(names->instances, names->numInstances, bestFeature, bestSplit, &leftInstances, &numLeft, &rightInstances, &numRight);
+
+  printf("# Left: %d\n", numLeft);
+  printInstances(leftInstances, numLeft, names->numFeatures);
+  printf("\n");
+  
+  printf("# Right: %d\n", numRight);
+  printInstances(rightInstances, numRight, names->numFeatures);
+  printf("\n");
     
   free(leftInstances);
   free(rightInstances);
-
 }
 
 // Constructs a tree on the input data and returns a pointer to it
