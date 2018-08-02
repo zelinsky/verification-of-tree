@@ -11,7 +11,7 @@ $input int classes[n]; // array of classes of instances
 $input double featureValues[n][f]; // array of feature values of instances
 
 $assume(n>0 && f>0 && c>0); // lowerbounds
-$assume(n<=10 && f<=5 && c<=3); // upperbounds
+$assume(n<=10 && f<=5 && c<=5); // upperbounds
 $assume($forall(int i | i >= 0 && i < n) classes[i] >= 0 && classes[i] < c);
 $assume($forall(int i | i >= 0 && i < n) $forall(int j | j >= 0 && j < f) featureValues[i][j] >= 0);
 //Feature values are ordered across instances
