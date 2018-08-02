@@ -127,7 +127,8 @@ void split(Instance** instances, int numInstances, int feature, double split, In
   *numRightOut = numRight;
 }
 
-// Returns the entropy of the array of instances split on the specified feature and split value
+// Returns a random, unique entropy value for abstraction purposes, but this will not work for us, since we need to pick
+// a feature and split value that sends at least once instance to the left node and one to the right node
 /*double calcEntropy(Instance** instances, int numInstances, int feature, double split, int numClasses) {
   double x;
   $havoc(&x);
@@ -135,8 +136,10 @@ void split(Instance** instances, int numInstances, int feature, double split, In
   return x;
   }*/
 
-// Finds the feature and split value that minimize the entropy on the list of instances
-// Changes the input parameters featureOut and splitOut to the best feature and split value
+// 'Abstraction' of real findBestFeatureAndSplit function for tree verification purposes
+// Finds a feature and split value that will split the instances so that a least one instance goes to the left node
+// and at least one goes to the right node
+// Changes the input parameters featureOut and splitOut to the chosen feature and split value
 void findBestFeatureAndSplit(Instance** instances, int numInstances, int numFeatures, int numClasses, int* featureOut, double* splitOut) {
   assert(instances != NULL);
   assert(numFeatures > 0);
@@ -164,6 +167,7 @@ void findBestFeatureAndSplit(Instance** instances, int numInstances, int numFeat
       }
     }
   }
+  printf("SHOULD NEVER REACH HERE\n");
   //return;
 }
 
